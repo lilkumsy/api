@@ -1,49 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Data Display</title>
+</head>
+<body>
+
 <?php
-include('connection.php');
-if (isset($_POST['orderNumber']) && $_POST['orderNumber'] != "") {
-    $orderNumber = $_POST['orderNumber'];
-    $url = "http://10.2.2.50:81/xampp/api/api.php?orderNumber=10112";
+// API endpoint
+$apiUrl = 'http://localhost:81/xampp/api/api.php?orderNumber=10112';
 
-    $client = curl_init($url);
-    curl_setopt($client, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-    curl_setopt($client, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($client, CURLOPT_VERBOSE, true);
-    $response = curl_exec($client);
+// Make API request
+$data = file_get_contents($apiUrl);
 
-    // Debugging output
-    var_dump($url, $response);
+if ($data) {
+    // Decode JSON data
+    $decodedData = json_decode($data, true);
 
-    if ($response === false) {
-        echo "cURL Error: " . curl_error($client);
-    } else {
-        $result = json_decode($response);
-
-        // Debugging output
-        var_dump($result);
-
-        if ($result === null) {
-            echo "Error decoding JSON response";
-        } else {
-            echo "<table>";
-            echo "<tr><td>Order number:</td><td>$result->orderNumber</td></tr>";
-            echo "<tr><td>Order Date:</td><td>$result->orderDate</td></tr>";
-            echo "<tr><td>Required Date:</td><td>$result->requiredDate</td></tr>";
-            echo "<tr><td>Shipped Date:</td><td>$result->shippedDate</td></tr>";
-            echo "<tr><td>Status:</td><td>$result->status</td></tr>";
-            echo "<tr><td>Comments:</td><td>$result->comments</td></tr>";
-            echo "<tr><td>Customer Number:</td><td>$result->customerNumber</td></tr>";
-            echo "</table>";
-        }
-    }
-
-    curl_close($client);
+    // Display data
+	echo '<center>DATA FROM API';
+    echo '<h3>Order Number: ' . $decodedData['orderNumber'] . '</h3>';
+    echo '<h3>OrderDate: ' . $decodedData['orderDate'] . '</h3>';
+	echo '<h3>Required Date: ' . $decodedData['requiredDate'] . '</h3>';
+    echo '<h3>Shipped Date: ' . $decodedData['shippedDate'] . '</h3>';
+	echo '<h3>Status: ' . $decodedData['status'] . '</h3>';
+    echo '<h3>Comments: ' . $decodedData['comments'] . '</h3>';
+	echo '<h3>Customer Number: ' . $decodedData['customerNumber'] . '</h3></center>';
+} else {
+    // Handle error
+    echo 'Error fetching data from the API.';
 }
 ?>
-<center>
-    <form action="" method="POST">
-        <label>Enter Order Number:</label><br /><br />
-        <input type="text" name="orderNumber" placeholder="Enter Order number" required />
-        <br /><br />
-        <button type="submit" name="submit">Check Order Details</button>
-    </form>
-</center>
+
+</body>
+</html>
